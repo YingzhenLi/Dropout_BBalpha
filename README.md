@@ -19,7 +19,7 @@ I've got quite a few emails on how to incorporate our method into their Keras co
 
 template file: [template_model.py](template_model.py)
 
-## repreduce the adversarial attack example
+## repreducing the adversarial attack example
 
 We also provide the adversarial attack detection codes. The attack implementation was adapted from the [cleverhans](http://www.cleverhans.io/) toolbox (version 1.0), and I rewrited the targeted attack to make it an iterative method.
 
