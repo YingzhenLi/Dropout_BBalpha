@@ -2,8 +2,8 @@
 
 Thank you for your interest in our paper:
 
-[Yingzhen Li](yingzhenli.net) and 
-[Yarin Gal](yarin.co)
+[Yingzhen Li](http://yingzhenli.net) and 
+[Yarin Gal](http://yarin.co)
 
 [Dropout inference in Bayesian neural networks with alpha-divergences](http://proceedings.mlr.press/v70/li17a/li17a.pdf)
 
