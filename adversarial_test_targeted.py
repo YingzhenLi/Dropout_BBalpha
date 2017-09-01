@@ -59,10 +59,13 @@ def main(argv=None):
     y = tf.placeholder(tf.float32, shape=(None, 10))
 
     # Define TF model graph by loading model
-    path = '/homes/mlghomes/yl494/proj/dropout/adversarial/test/'
+    path = ‘save/‘
+    # the following are the config of the trained model
     alpha = 1.0; K_mc = 10; n_epoch = 500; nb_layers = 3
     nb_units = 1000; p = 0.5; wd = 1e-6; nb_classes = 10
-    model_arch = 'mlp'; dropout = 'MC'; n_mc = 10
+    model_arch = 'mlp'
+    dropout = 'MC'	# test mode for adversarial examples
+    n_mc = 10	# number of MC samples used for adversarial test
     model = load_model(path, alpha, K_mc, n_epoch, nb_layers, \
                        nb_units, p, wd, nb_classes, model_arch, \
                        dropout, n_mc)

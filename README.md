@@ -1,6 +1,7 @@
 # Dropout + BB-alpha for detecting adversarial examples
 
 Thank you for your interest in our paper:
+
 [Yingzhen Li](yingzhenli.net) and 
 [Yarin Gal](yarin.co)
 
@@ -24,7 +25,7 @@ We also provide the adversarial attack detection codes. The attack implementatio
 
 To reproduce the experiments, first train a model on mnist:
 
-python train_model.py <K_mc> <alpha> <nb_layers> <nb_units> <p> <model_arch>
+python train_model.py K_mc alpha nb_layers nb_units p model_arch
 
 with K_mc the number of MC samples for training, nb_layers the number of layers of the NN, nb_units the number of hidden units in each hidden layer, p the dropout rate (between 0 and 1), and model_arch = mlp or cnn
 
