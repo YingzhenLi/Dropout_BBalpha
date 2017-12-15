@@ -1,5 +1,13 @@
 # Dropout + BB-alpha for detecting adversarial examples
 
+## update: added concrete dropout versions
+
+Can directly run it as before. Although here I still ask for an input of the dropout rate p, if you use concrete dropout, that p rate will never be used, and instead the concrete dropout method will fit another dropout rate.
+
+It still needs hyper-parameter tuning, e.g. please modify the values used in [here](BBalpha_concrete.py#L96)
+
+## from master branch
+
 Thank you for your interest in our paper:
 
 [Yingzhen Li](http://yingzhenli.net) and 
