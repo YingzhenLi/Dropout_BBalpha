@@ -4,7 +4,7 @@
 
 Can directly run it as before. Although here I still ask for an input of the dropout rate p, if you use concrete dropout, that p rate will never be used, and instead the concrete dropout method will fit another dropout rate.
 
-It still needs hyper-parameter tuning, e.g. please modify the values used in [here](BBalpha_concrete.py#L96)
+It still needs hyper-parameter tuning, e.g. please modify the values used in [here](BBalpha_concrete.py#L97).
 
 ## from master branch
 
