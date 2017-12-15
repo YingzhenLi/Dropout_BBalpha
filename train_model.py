@@ -1,13 +1,3 @@
-'''
-Copyright 2017, Yingzhen Li and Yarin Gal, All rights reserved.
-Please consider citing the ICML 2017 paper if using any of this code for your research:
-
-Yingzhen Li and Yarin Gal.
-Dropout inference in Bayesian neural networks with alpha-divergences.
-International Conference on Machine Learning (ICML), 2017.
-
-'''
-
 from keras import backend as K
 from keras.callbacks import Callback
 from keras.datasets import mnist
@@ -17,7 +7,7 @@ from keras.regularizers import l2
 from keras.utils import np_utils
 import numpy as np
 import os, pickle, sys, time
-from BBalpha_dropout import *
+from BBalpha_concrete import *
 
 nb_epoch = 500
 nb_batch = 128
@@ -33,12 +23,14 @@ if len(sys.argv) == 7:
     p = float(sys.argv[5])
     model_arch = sys.argv[6]
 
-folder = 'save/' + model_arch + '_nb_layers_' + str(nb_layers) + '_nb_units_' + str(nb_units) + '_p_' + str(p) + '/'
+#folder = 'save/' + model_arch + '_nb_layers_' + str(nb_layers) + '_nb_units_' + str(nb_units) + '_p_' + str(p) + '/'
+# for concrete dropout
+folder = 'save/' + model_arch + '_nb_layers_' + str(nb_layers) + '_nb_units_' + str(nb_units) + '_concrete/'
 if not os.path.exists('save/'):
     os.makedirs('save/')
 if not os.path.exists(folder):
     os.makedirs(folder)
-
+    
 file_name = folder + 'K_mc_' + str(K_mc) + '_alpha_' + str(alpha) + '.obj'
 print file_name
 
@@ -69,22 +61,23 @@ Y_test = np_utils.to_categorical(y_test, nb_classes)
 
 ###################################################################
 # compile model
-
+dropout = 'concrete'#'MC'
 inp = Input(shape=input_shape)
 if model_arch == 'mlp':
-    layers = get_logit_mlp_layers(nb_layers, nb_units, p, wd, nb_classes, dropout = 'MC')
+    layers = get_logit_mlp_layers(nb_layers, nb_units, p, wd, nb_classes, dropout = dropout)
 else:
-    layers = get_logit_cnn_layers(nb_units, p, wd, nb_classes, dropout = 'MC')
+    layers = get_logit_cnn_layers(nb_units, p, wd, nb_classes, dropout = dropout)
 mc_logits = GenerateMCSamples(inp, layers, K_mc)
 if alpha != 0:
     model = Model(input=inp, output=mc_logits)
-    model.compile(optimizer='sgd', loss=bbalpha_softmax_cross_entropy_with_mc_logits(alpha),
+    model.compile(optimizer='sgd', loss=bbalpha_softmax_cross_entropy_with_mc_logits(alpha, K_mc), 
                   metrics=['accuracy'])
 else:
     mc_softmax = Activation('softmax')(mc_logits)  # softmax is over last dim
     model = Model(input=inp, output=mc_softmax)
-    model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
-
+    model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])   
+print 'model.losses = %d' % (len(model.losses))
+#assert len(model.losses) == 4
 mc_logits = GenerateMCSamples(inp, layers, nb_test_mc)
 mc_softmax = Activation('softmax')(mc_logits)  # softmax is over last dim
 test_model = Model(input=inp, output=mc_softmax)
@@ -100,7 +93,7 @@ evals = {'acc_approx': [], 'acc': [], 'll': [], 'time': [], 'train_acc': [], 'tr
          'nb_layers': nb_layers, 'nb_units': nb_units}
 for i in xrange(100):
     tic = time.clock()
-    train_loss = model.fit(X_train, Y_train_dup, verbose=1,
+    train_loss = model.fit(X_train, Y_train_dup, verbose=1, 
                            batch_size=nb_batch, nb_epoch=nb_epoch//100)
     toc = time.clock()
     evals['acc_approx'] += [model.evaluate(X_test, Y_test_dup, verbose=0)[1]]

@@ -1,7 +1,3 @@
-'''
-Adapted from the cleverhans package (ver 1.0.0)
-'''
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -59,19 +55,19 @@ def main(argv=None):
     y = tf.placeholder(tf.float32, shape=(None, 10))
 
     # Define TF model graph by loading model
-    path = ‘save/‘
-    # the following are the config of the trained model
-    alpha = 1.0; K_mc = 10; n_epoch = 500; nb_layers = 3
+    #path = '/homes/mlghomes/yl494/proj/dropout/adversarial/test/'
+    path = 'save/'
+    alpha = 0.0; K_mc = 1; n_epoch = 500; nb_layers = 3
     nb_units = 1000; p = 0.5; wd = 1e-6; nb_classes = 10
-    model_arch = 'mlp'
-    dropout = 'MC'	# test mode for adversarial examples
-    n_mc = 10	# number of MC samples used for adversarial test
+    model_arch = 'mlp' 
+    dropout = 'concrete'
+    n_mc = 10
     model = load_model(path, alpha, K_mc, n_epoch, nb_layers, \
                        nb_units, p, wd, nb_classes, model_arch, \
                        dropout, n_mc)
-
+    
     # construct prediction tensor
-    if dropout == 'MC':
+    if dropout in ['MC', 'concrete']:
         predictions = MC_dropout(model, x, n_mc = n_mc)
         string = ' (with MC, %d samples)' % n_mc
     else:
@@ -80,8 +76,8 @@ def main(argv=None):
 
     # first check model accuracy on test data
     accuracy, entropy_mean, entropy_ste = model_eval(sess, x, y, predictions, X_test, Y_test)
-    print('Test accuracy on test data: ' + str(accuracy) + string)
-    print('Test entropy on test data: ' + str(entropy_mean) + string)
+    print('Test accuracy on test data: ' + str(accuracy) + string)   
+    print('Test entropy on test data: ' + str(entropy_mean) + string)   
 
     # Craft adversarial examples using Fast Gradient Sign Method (FGSM)
     stepsize = tf.placeholder(tf.float32, shape=())
@@ -89,7 +85,7 @@ def main(argv=None):
     x_original_ph = tf.placeholder(tf.float32, shape=(None, 784))
     adv_x = fgsm_targeted(x, predictions, None, eps=stepsize, \
         clip_min = 0.0, clip_max = 1.0, target_class = target_class)
-
+    
     accuracy_list = [accuracy]
     accuracy_target_list = [0.0]
     entropy_mean_list = [entropy_mean]
@@ -119,10 +115,10 @@ def main(argv=None):
         entropy_ste_list.append(entropy_ste)
         X_input = X_test_adv
         vis_images.append(X_test_adv[0])
-
-    print('Test accuracy on adversarial data: ' + str(accuracy) + string)
-    print('Test entropy on adversarial data: ' + str(entropy_mean) + string)
-
+   
+    print('Test accuracy on adversarial data: ' + str(accuracy) + string)   
+    print('Test entropy on adversarial data: ' + str(entropy_mean) + string)   
+ 
     accuracy_list = np.array(accuracy_list)
     accuracy_target_list = np.array(accuracy_target_list)
     entropy_mean_list = np.array(entropy_mean_list)
@@ -135,7 +131,7 @@ def main(argv=None):
         entropy_mean_list + entropy_ste_list, color='r', alpha=0.3)
     plot_images(ax[2], np.array(vis_images[::10]), shape = (28, 28))
     plt.savefig('targeted_attack.png', format='png')
-
+    
     # save result
     filename = model_arch + '_nb_layers_' + str(nb_layers) \
              + '_nb_units_' + str(nb_units) + '_p_' + str(p) + \
